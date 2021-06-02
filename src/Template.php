@@ -2,7 +2,7 @@
 
 namespace FetidDandilions;
 
-class Template
+final class Template
 {
     public function __construct( public string $slug, public array $atts = [], public int $code = 200 )
     {

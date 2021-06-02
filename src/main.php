@@ -2,12 +2,7 @@
 
 namespace FetidDandilions;
 
-function getServerRoot() : string
-{
-    return dirname( __DIR__ );
-}
-
-require( getServerRoot() . '/vendor/autoload.php' );
+require( dirname( __DIR__ ) . '/vendor/autoload.php' );
 
 function getProtocol() : string
 {
@@ -65,6 +60,15 @@ function isPoemPage() : bool
     return str_starts_with( getLocalPath(), '/poem/' );
 }
 
+function getAllPoems() : array
+{
+    return array_map
+    (
+        fn( array $data ) => new Poem( $data[ 'poem_id' ], $data[ 'poem_title' ], $data[ 'poem_content' ] ),
+        Database::selectAll( 'poem' )
+    );
+}
+
 function getTemplateByPath() : Template
 {
     if ( isHome() )
@@ -74,7 +78,7 @@ function getTemplateByPath() : Template
     else if ( isArchivePage() )
     {
         $type = getSubPath( 'poetry' );
-        return new Template( 'archive', [ 'type' => $type ] );
+        return new Template( 'archive', [ 'type' => $type, 'poems' => getAllPoems() ] );
     }
     else if ( isPoemPage() )
     {
@@ -96,7 +100,8 @@ if ( !str_ends_with( getLocalPath(), '/' ) )
 }
 
 // Render template.
+Database::connect();
 $template = getTemplateByPath();
 http_response_code( $template->code );
-echo ( new \Twig\Environment( new \Twig\Loader\FilesystemLoader( getServerRoot() . '/views' ) ) )->
+echo ( new \Twig\Environment( new \Twig\Loader\FilesystemLoader( Path::getServerRoot() . '/views' ) ) )->
     render( "$template->slug.twig", $template->atts );

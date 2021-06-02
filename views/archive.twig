@@ -2,4 +2,10 @@
 
 {% block content %}
     <h1>Poem Lists</h1>
+    {% for poem in poems %}
+        <article>
+            <h1>{{ poem.title }}</h1>
+            <div>{{ poem.content|raw }}</div>
+        </article>
+    {% endfor %}
 {% endblock %}
