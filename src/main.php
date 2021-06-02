@@ -2,6 +2,13 @@
 
 namespace FetidDandilions;
 
+function getServerRoot() : string
+{
+    return dirname( __DIR__ );
+}
+
+require( getServerRoot() . '/vendor/autoload.php' );
+
 function getProtocol() : string
 {
     return ( array_key_exists( 'HTTPS', $_SERVER ) && $_SERVER[ 'HTTPS' ] ) ? 'https' : 'http';
@@ -45,17 +52,41 @@ function isHome() : bool
 
 function isArchivePage() : bool
 {
-    return str_starts_with( getLocalPath(), '/poetry/' );
+    return str_starts_with( getLocalPath(), Path::getArchiveLocalDir() );
 }
 
 function getArchivePath() : string
 {
-    return getRootPath() . '/poetry/';
+    return getRootPath() . Path::getArchiveLocalDir();
 }
 
 function isPoemPage() : bool
 {
     return str_starts_with( getLocalPath(), '/poem/' );
+}
+
+function getTemplateByPath() : Template
+{
+    if ( isHome() )
+    {
+        return new Template( 'index' );
+    }
+    else if ( isArchivePage() )
+    {
+        $type = getSubPath( 'poetry' );
+        return new Template( 'archive', [ 'type' => $type ] );
+    }
+    else if ( isPoemPage() )
+    {
+        $slug = getSubPath( 'poem' );
+        if ( empty( $slug ) )
+        {
+            redirectPermanent( getArchivePath() );
+        }
+        return new Template( 'poem', [ 'slug' => $slug ] );
+    }
+
+    return new Template( '404', [], 404 );
 }
 
 // Keep domains consistent by redirecting those not ending in slash with those that do.
@@ -64,22 +95,8 @@ if ( !str_ends_with( getLocalPath(), '/' ) )
     redirectPermanent( getFullPath() . '/' );
 }
 
-if ( isHome() )
-{
-    echo 'Welcome Home';
-}
-else if ( isArchivePage() )
-{
-    $slug = getSubPath( 'poetry' );
-    echo 'Poetry Archive';
-    echo "Type: $slug";
-}
-else if ( isPoemPage() )
-{
-    $slug = getSubPath( 'poem' );
-    if ( empty( $slug ) )
-    {
-        redirectPermanent( getArchivePath() );
-    }
-    echo "Poem: $slug";
-}
+// Render template.
+$template = getTemplateByPath();
+http_response_code( $template->code );
+echo ( new \Twig\Environment( new \Twig\Loader\FilesystemLoader( getServerRoot() . '/views' ) ) )->
+    render( "$template->slug.twig", $template->atts );
