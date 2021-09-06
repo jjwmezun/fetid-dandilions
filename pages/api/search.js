@@ -1,6 +1,8 @@
 import { getSortedPoemsData } from '../../lib/poems'
 const poems = process.env.NODE_ENV === `production` ?
-    require( '../../cache/data' ).poems : getSortedPoemsData()
+    require( `${ process.pwd }/cache/data` ).poems : getSortedPoemsData()
+
+console.log( `${ process.pwd }/cache/data` );
 
 export default function handler(req, res) {
     const results = req.query.q ?
