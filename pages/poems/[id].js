@@ -1,7 +1,7 @@
-import Date from '../../components/date'
-import GlobalLayout from '../../components/global-layout'
+import Date from '$/components/date'
+import GlobalLayout from '$/components/global-layout'
 import Head from 'next/head'
-import PoemLayout from '../../components/poem-layout'
+import PoemLayout from '$/components/poem-layout'
 import { getAllPoemIds, getPoemData } from '../../lib/poems'
 import Link from 'next/link'
 

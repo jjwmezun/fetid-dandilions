@@ -1,10 +1,10 @@
-import Date from '../components/date'
-import GlobalLayout from '../components/global-layout'
+import Date from '$/components/date'
+import GlobalLayout from '$/components/global-layout'
 import Head from 'next/head'
 import Image from 'next/image'
 import Link from 'next/link'
 
-import { getSortedPoemsData } from '../lib/poems'
+import { getSortedPoemsData } from '$/lib/poems'
 
 export async function getStaticProps() {
   const allPoemsData = getSortedPoemsData()

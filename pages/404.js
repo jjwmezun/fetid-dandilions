@@ -1,4 +1,4 @@
-import GlobalLayout from '../components/global-layout'
+import GlobalLayout from '$/components/global-layout'
 import Link from 'next/link'
 
 export default function Custom404() {
